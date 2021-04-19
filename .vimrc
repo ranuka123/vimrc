@@ -14,6 +14,9 @@ Plugin 'pangloss/vim-javascript'
 Plugin 'leafgarland/typescript-vim'
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
+" Plugin 'OmniSharp/omnisharp-vim' buggy so disabling
+Plugin 'hashivim/vim-terraform'
+Plugin 'neoclide/coc.nvim'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -37,18 +40,18 @@ set autoindent
 set expandtab
 set smartcase
 set hlsearch
-set nohidden
+set hidden
 set incsearch
 set backspace=2
 set wildmenu
 set wildmode=list:longest,full
 inoremap jk <C-[>
-noremap <Up> <NOP>
-noremap <Down> <NOP>
+"noremap <Up> <NOP>
+"noremap <Down> <NOP>
 set wildchar=<Tab> wildmenu wildmode=full
 set wildcharm=<C-Z>
 nnoremap <f10> :b <c-z>
-nnoremap <space> @q
+" nnoremap <space> @q disabling this because its freezing vim
 map <Left> :bprevious<CR>
 map <Right> :bnext<CR>
 nmap <silent> <MiddleMouse> :bp\|bd #<CR>
@@ -90,3 +93,72 @@ command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 set mouse=a
 set cb=unnamed
 set background=light
+
+" fix for meaning to press w but press W which causes a window to pop up
+:command W w
+" https://unix.stackexchange.com/questions/88714/how-can-i-do-a-change-word-in-vim-using-the-current-paste-buffer
+:map <C-j> "_cw<C-r>*<ESC>
+
+" https://www.reddit.com/r/neovim/comments/5usi1q/how_to_change_tab_or_window_once_in_terminal/
+tnoremap <C-w>h <C-\><C-n><C-w>h
+tnoremap <C-w>j <C-\><C-n><C-w>j
+tnoremap <C-w>k <C-\><C-n><C-w>k
+tnoremap <C-w>l <C-\><C-n><C-w>l
+
+
+" COC
+"TextEdit might fail if hidden is not set.
+set hidden
+
+" Some servers have issues with backup files, see #649.
+set nobackup
+set nowritebackup
+
+" Give more space for displaying messages.
+set cmdheight=2
+
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+if has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+highlight SignColumn ctermbg=none
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+"https://github.com/fatih/vim-go/issues/2256
+
